@@ -1,4 +1,6 @@
 package org.cloudbus.cloudsim.examples;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 import org.cloudsimplus.brokers.DatacenterBroker;
 import org.cloudsimplus.brokers.DatacenterBrokerSimple;
@@ -34,13 +36,20 @@ public class CustomerWorkloadSimulation {
     private List<Cloudlet> iotTasks;
 
     public static void main(String[] args) {
+    try {
         new CustomerWorkloadSimulation();
+    } catch (Exception e) {
+        e.printStackTrace();
+        System.exit(1);
     }
+}
+
 
     public CustomerWorkloadSimulation() {
         System.out.println("Starting Edge Computing Simulation");
         simulation = new CloudSimPlus();
-        createEdgeDataCenter();
+        Datacenter dc = createEdgeDataCenter();
+
         broker = new DatacenterBrokerSimple(simulation);
         edgeServers = createEdgeServers();
         iotTasks = createIoTasks();
@@ -99,12 +108,23 @@ public class CustomerWorkloadSimulation {
     }
 
     private void printResults() {
-        List<Cloudlet> finishedTasks = broker.getCloudletFinishedList();
-        new CloudletsTableBuilder(finishedTasks).build();
+    List<Cloudlet> finishedTasks = broker.getCloudletFinishedList();
+    new CloudletsTableBuilder(finishedTasks).build();
 
-        double totalLatency = finishedTasks.stream()
-            .mapToDouble(task -> task.getFinishTime() - task.getStartTime())
-            .sum();
-        System.out.printf("\nAverage Latency: %.2f sec\n", totalLatency / finishedTasks.size());
+    double totalLatency = finishedTasks.stream()
+        .mapToDouble(task -> task.getFinishTime() - task.getStartTime())
+        .sum();
+    double avgLatency = totalLatency / finishedTasks.size();
+    System.out.printf("\nAverage Latency: %.2f sec\n", avgLatency);
+
+    try (PrintWriter writer = new PrintWriter("output/simulation_results.txt")) {
+        writer.println("========== FINAL RESULTS ==========");
+        writer.printf("Average Latency: %.2f sec\n", avgLatency);
+        writer.println("Total Energy Consumption: 0 (placeholder)");
+    } catch (IOException e) {
+        System.err.println("Could not write results file.");
+        e.printStackTrace();
     }
+}
+
 }
