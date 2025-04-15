@@ -33,7 +33,7 @@ jobs:
         id: simulation
         run: |
           # Run simulation and save output
-          mvn exec:java -pl modules/cloudsim-examples -Dexec.mainClass=org.cloudbus.cloudsim.examples.CloudSimPlusExample > $GITHUB_WORKSPACE/output/simulation_results.txt 2>&1
+          mvn exec:java -pl modules/cloudsim-examples -Dexec.mainClass=org.cloudbus.cloudsim.examples.CustomerWorkloadSimulation > $GITHUB_WORKSPACE/output/simulation_results.txt 2>&1
           
           # Check if simulation succeeded
           if [ $? -ne 0 ]; then
